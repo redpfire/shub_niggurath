@@ -51,6 +51,25 @@ defmodule Wheel.Pkg do
     def drop(arr, pkg) do
         drop_(arr,pkg,[],length(arr),0)
     end
+
+    def join_names_(pkgs, n, o, len) when n < len do
+      el = Enum.at(pkgs, n)
+      o =
+        if o != "" do
+          "#{o}, #{el.name}"
+        else
+          "#{el.name}"
+        end
+      join_names_(pkgs,n+1,o,len)
+    end
+
+    def join_names_(pkgs,n,o,len) when n >= len do
+      o
+    end
+
+    def join_names(pkgs) do
+      join_names_(pkgs, 0, "", length(pkgs))
+    end
 end
 
 defmodule Wheel do
@@ -101,6 +120,9 @@ defmodule Wheel do
                 npkgs = map[:pkgs] ++ [pkg]
                 map = %{map | pkgs: npkgs}
                 roll(map)
+            {:get_packages, pid} ->
+                send pid, {:ok, map[:pkgs]}
+                roll(map)
             {:get_class, class, pid} ->
                 pkg_ = find_class(map[:pkgs], class)
                 if pkg_ != nil do
@@ -118,7 +140,7 @@ defmodule Wheel do
                 if Process.whereis(:console) == pid do
                     IO.puts("\r#{inspect map[:pkgs]}")
                 end
+                roll(map)
         end
-        #roll(map)
     end
 end

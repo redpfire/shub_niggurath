@@ -167,6 +167,17 @@ defmodule Commands do
         send self(), {:register, c}
         c = %Command{name: "leave_role", fun: fun}
         send self(), {:register, c}
+
+        fun = fn args, c_map ->
+          send :wheel, {:get_packages, self()}
+          receive do
+            {:ok,pkgs} ->
+              str = Wheel.Pkg.join_names(pkgs)
+              DexHelper.send_message(c_map, c_map.channel, "Modules:\n```#{str}```")
+          end
+        end
+        c = %Command{name: "modules", fun: fun}
+        send self(), {:register, c}
     end
 
     def roll(map) do
