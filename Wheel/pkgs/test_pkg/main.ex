@@ -12,7 +12,7 @@ defmodule TestPkg do
     end
 
     def init() do
-        Pkg.register!(TestPkg, "modmodmod")
+        Pkg.register!(TestPkg, "test_mod")
         Pkg.register_cmd!(TestPkg, "lol", fn a,b -> cmd(a,b) end)
     end
 end

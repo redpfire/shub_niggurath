@@ -4,7 +4,15 @@ require DiscordEx
 
 defmodule Command do
     @enforce_keys [:name, :fun]
-    defstruct name: "", fun: nil
+    defstruct name: "", fun: nil, owner: false
+
+    def has_permission(id, cmd) do
+      if id == 197463298151677953 || !cmd[:owner] do # temporary
+         true
+       else
+         false
+       end
+    end
 
     def fetch(map, field) do
         Map.fetch(map, field)
@@ -84,7 +92,7 @@ defmodule Commands do
                 RichEmbed.send(re, c_map, c_map.channel)
             end
         end
-        c = %Command{name: "eval", fun: fun}
+        c = %Command{name: "eval", fun: fun, owner: true}
         send self(), {:register, c}
 
         fun = fn args,c_map ->
@@ -176,7 +184,7 @@ defmodule Commands do
               DexHelper.send_message(c_map, c_map.channel, "Modules:\n```#{str}```")
           end
         end
-        c = %Command{name: "modules", fun: fun}
+        c = %Command{name: "modules", fun: fun, owner: true}
         send self(), {:register, c}
     end
 

@@ -7,7 +7,7 @@ defmodule Sandbox do
     def start(bot) do
         p = spawn fn -> roll(%{
             bot: bot,
-            prefix: "xd;"
+            prefix: "sn;"
         }) end
         Selfroles.Spinlock.start()
         Process.register(p, :sandbox)
@@ -41,8 +41,12 @@ defmodule Sandbox do
                                 {:error, :notfound} ->
                                     Logger.info("Command not found.")
                                     DexHelper.react(e_map, "✨", e_map.channel, e_map.payload.data["id"])
-                                {:cmd, f} ->
-                                    spawn fn -> traverse(f[:fun], args, e_map) end
+                              {:cmd, f} ->
+                                if Command.has_permission(author["id"], f) do
+                                  spawn fn -> traverse(f[:fun], args, e_map) end
+                                else
+                                  DexHelper.react(e_map, "😠", e_map.channel, e_map.payload.data["id"])
+                                end
                             end
                         end
                     _ ->
